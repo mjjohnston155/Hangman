@@ -1,2 +1,1 @@
-# Hangman
-JQuery Hangman Game
+# Word-Guess-Game

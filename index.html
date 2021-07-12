@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="UTF-8">
+    <title> Hangman Game</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+
+    <script src="https://code.jquery.com/jquery.js"></script>
+</head>
+
+
+<body>
+        <div id="main-container" class="container" style="background:black">   
+                  <div class="row">
+                      <div class="col-md-4 offset-4" >
+                            <img src="assets/images/hangmanword.jpg" class="img-fluid" alt="Responsive image">
+                      </div>
+
+                </div>
+                <div class="row">
+                  <div class="col-md-4 offset-4" style="text-align: center; background:black; color: white">
+                    Press any key to get started!
+                  </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 offset-4" style="text-align: center; background:black; color: white" id="win-tracker-div">
+                    Wins: 
+                    </div>
+                     </div> 
+                <div class="row">
+                  <div class="col-md-4 offset-4" style="text-align: center; background:black; color: white">
+                    Current Word
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 offset-4" style="text-align: center; background:black; color: white" id="revealed-word-div">
+                    
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 offset-4" style="text-align: center; background:black; color: white">
+                    Guesses Remaining
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 offset-4" style="text-align: center; background:black; color: white" id="guesses-remaining-div">
+                    
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 offset-4" style="text-align: center; background:black; color: white">
+                    Letters Already Guessed
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 offset-4" style="text-align: center; background:black; color: white" id="letters-guessed-div">
+                    
+                  </div>
+                </div>         
+              </div>
+
+
+
+
+<script>
+    
+    var current_word;
+    var wins = 0;
+    var losses = 0;
+    var guesses_remaining;
+    var letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
+     "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+    var wordpool = ["cowboy", "bandana", "winchester", "magnum", "posse", "justice", "bounty",
+     "saloon", "shootout", "corral", "livestock", "cattle", "railroad", "frontier", "lawman"];
+     var guessed_letters = [];
+     var word_progress = [];
+
+     function initiateWord() {
+      //  resetting variables
+      $("#letters-guessed-div").html(" ");
+       guessed_letters.length = 0;
+       word_progress = [];
+       guesses_remaining = 14;
+      $("#revealed-word-div").html(" ");
+         //  Choose word from pool randomly
+      current_word = wordpool[Math.floor(Math.random() * wordpool.length)];
+          // populate word_progress variable with proper number of underscores
+       for (i=0; i < (current_word.length); i++) {
+         word_progress[i] = "_";
+        }
+       
+        for (i=0; i < (current_word.length * 2); i++) {
+      if (i % 2 == 0) {
+        $("#revealed-word-div").append(word_progress[(i / 2)]);
+        console.log(word_progress);
+      }
+      else $("#revealed-word-div").append(" ");
+       }
+      $("#guesses-remaining-div").html(guesses_remaining);
+      $("#loss-tracker-div").html(losses);
+      $("#win-tracker-div").html("Wins: " + wins);
+
+      // test logs
+     console.log(word_progress);
+     console.log(current_word);
+     }
+     
+     function processGuess(choice) {
+       for (i=0; i < (current_word.length); i++) {
+         var n = current_word.indexOf(choice, i);
+         word_progress[n] = choice;
+         }
+
+       for (i=0; i < (current_word.length * 2); i++) {
+      
+      // fills in guessed 
+      if ((i % 2 == 0 && current_word.indexOf(i) == choice)) {
+        $("#revealed-word-div").append(choice);
+      }
+      else if (i % 2 == 0) {
+        $("#revealed-word-div").append(word_progress[(i / 2)]);
+      }
+      else $("#revealed-word-div").append(" ");
+    }
+     }
+
+  
+
+    
+    initiateWord();
+
+     document.onkeyup = function(event) {
+
+        var choice = event.key;
+
+        console.log(word_progress);
+
+        // if valid input + correct guess + not previously guessed
+        if (current_word.includes(choice) && letters.includes(choice) && !guessed_letters.includes(choice)){
+          
+        //  emptys revealed word div prior to replacing
+         $("#revealed-word-div").html(" ");
+          
+          processGuess(choice);
+
+          // tracks guessed letters
+          guessed_letters.push(choice);
+
+        }
+        // if valid input + incorrect guess + not previously guessed
+        else if (letters.includes(choice) && !current_word.includes(choice) && !guessed_letters.includes(choice)){
+            guesses_remaining--;
+            $("#letters-guessed-div").append(" " + choice);
+            guessed_letters.push(choice);
+            $("#guesses-remaining-div").html(guesses_remaining);
+        }
+        else {
+            // do nothing, invalid input or already guessed
+        }
+        if (guesses_remaining==0) {
+          losses++;
+          initiateWord();
+        }
+        if (!word_progress.includes("_")){
+          wins++;
+          initiateWord();
+        }
+        }
+
+        
+</script>
+
+</body>
+
+</html>
